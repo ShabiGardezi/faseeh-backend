@@ -154,7 +154,9 @@ Format the email with:
       },
     };
 
-    return await watsonxAIService.generateText(params);
+    const result = await watsonxAIService.generateText(params);
+
+    return result.result.results[0];
   }
 }
 
