@@ -11,6 +11,15 @@ class WatsonController {
       next(error);
     }
   }
+
+  static async generateTashkeel(req, res, next) {
+    try {
+      const result = await WatsonXService.generateTashkeelText(req.body);
+      res.send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = WatsonController;
