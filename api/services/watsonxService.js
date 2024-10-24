@@ -41,6 +41,16 @@ Instructions:
 - Maintain the original meaning and grammatical structure
 - Ensure proper Arabic grammar rules (قواعد النحو) are followed
 - Keep the text exactly as provided without any additional explanations`,
+
+proofread: `SYSTEM: You are in strict correction-only mode. Output must contain only the corrected Arabic text with no additional content.
+
+TASK: Proofread and correct the Arabic text, fixing grammar, spelling, and punctuation. Return the corrected text exactly as is, with no additions.
+
+FORMAT: Return corrected Arabic text only. Stop immediately after the last Arabic character or punctuation mark. Any text in other languages or meta-notes will be considered an error.
+
+المطلوب: تصحيح النص التالي وإعادته مباشرة دون أي إضافات أو تعليقات:
+
+النص:`
 };
 
 const DEFAULT_MODEL_PARAMS = {
@@ -96,6 +106,22 @@ Vowelized output:`;
   });
 }
 
+async function generateProofReadingText(reqBody) {
+  const { content } = reqBody;
+
+ 
+  const prompt = `${PROMPTS.proofread}
+${content}
+
+النص المصحح:`;
+  return await generateResponse({
+    input: prompt,
+    projectId: projectIds.proofReading,
+    modelId: "sdaia/allam-1-13b-instruct",
+  });
+}
+
+
 function formatEmailQuestion({ purpose, recipient, tone, mainDetails, cta }) {
   return `الغرض من البريد الإلكتروني هو ${purpose}، موجه إلى ${recipient}، مكتوب بنبرة ${tone}، يحتوي على التفاصيل الرئيسية ${mainDetails}، مع دعوة للعمل ${cta}.`;
 }
@@ -115,4 +141,5 @@ async function generateResponse({ input, projectId, modelId }) {
 module.exports = {
   generateProfessionalEmailText,
   generateTashkeelText,
+  generateProofReadingText
 };

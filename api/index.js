@@ -16,6 +16,10 @@ app.use(express.json());
 app.use(routes);
 app.use(errorHandler);
 
+app.get("/", (req, res) => res.send("Express on Vercel"));
+
 app.listen(PORT, () =>
   console.log(`Server running on http://localhost:${PORT}`)
 );
+
+module.exports = app;
