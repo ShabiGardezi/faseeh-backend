@@ -40,6 +40,24 @@ class WatsonController {
       next(error);
     }
   }
+
+  static async generateChildrenStory(req, res, next) {
+    try {
+      const result = await WatsonXService.generateChildrenStoryText(req.body);
+      res.send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async generateMarketing(req, res, next) {
+    try {
+      const result = await WatsonXService.generateMarketingText(req.body);
+      res.send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = WatsonController;

@@ -69,6 +69,38 @@ Rules:
 - Exact format matching the example
 
 النص:`,
+  story: `
+  أنت كاتب محترف متخصص في كتابة قصص الأطفال التعليمية. مهمتك كتابة قصة تربوية للأطفال تستند على مثل عربي.
+
+  إرشادات كتابة القصة:
+  1. ابدأ القصة بـ "كان يا مكان"
+  2. اجعل البطل الرئيسي هو الطفل المذكور في المدخلات
+  3. اربط القصة بالمثل العربي بشكل غير مباشر
+  4. استخدم لغة بسيطة تناسب عمر الطفل
+  5. اجعل القصة تحتوي على:
+     - مقدمة تعرف بالشخصية الرئيسية
+     - حدث أو تحدي رئيسي
+     - حل يرتبط بمعنى المثل
+     - خاتمة تذكر المثل وتوضح معناه
+  6. اجعل طول القصة مناسباً (400-600 كلمة)
+  7. ادمج المثل في سياق القصة مرتين على الأقل
+  8. اختم القصة بذكر المثل والحكمة المستفادة منه
+  `,
+  marketing: `
+    You are an expert marketing copywriter. Create compelling marketing text that:
+    - Starts with an attention-grabbing headline
+    - Speaks directly to the target audience's needs and desires
+    - Clearly communicates the key benefits in a persuasive way
+    - Uses engaging and persuasive language
+    - Ends with a strong call-to-action
+    
+    Format the text with:
+    1. A bold headline
+    2. 2-3 compelling paragraphs
+    3. The call-to-action at the end
+    
+    Keep the tone professional yet conversational, and focus on creating emotional connection with the audience.
+    `,
 };
 
 const DEFAULT_MODEL_PARAMS = {
@@ -153,6 +185,115 @@ ${content}
   });
 }
 
+async function generateChildrenStoryText(reqBody) {
+  const { childName, age, proverb } = reqBody;
+
+  if (!childName || !age || !proverb) {
+    throw new Error(
+      "Missing required parameters: childName, age, and proverb are required"
+    );
+  }
+
+  const ageNum = parseInt(age);
+  if (isNaN(ageNum) || ageNum < 1 || ageNum > 18) {
+    throw new Error("Age must be a number between 1 and 18");
+  }
+
+  const input = constructStoryPrompt({
+    childName,
+    age: ageNum,
+    proverb,
+  });
+
+  return await generateResponse({
+    input,
+    projectId: projectIds.childrenStory,
+    modelId: "sdaia/allam-1-13b-instruct",
+  });
+}
+
+async function generateMarketingText(reqBody) {
+  const { productService, targetAudience, keyBenefits, callToAction } = reqBody;
+
+  validateInputs({
+    productService,
+    targetAudience,
+    keyBenefits,
+    callToAction,
+  });
+
+  const input = constructMarketingPrompt({
+    productService,
+    targetAudience,
+    keyBenefits,
+    callToAction,
+  });
+
+  return await generateResponse({
+    input,
+    projectId: projectIds.marketing,
+    modelId: "sdaia/allam-1-13b-instruct",
+  });
+}
+
+const validateInputs = ({
+  productService,
+  targetAudience,
+  keyBenefits,
+  callToAction,
+}) => {
+  if (!productService?.trim()) {
+    throw new Error("Product/Service name is required");
+  }
+  if (!targetAudience?.trim()) {
+    throw new Error("Target audience description is required");
+  }
+  if (keyBenefits.length <= 0) {
+    throw new Error("Key benefits are required");
+  }
+  if (!callToAction?.trim()) {
+    throw new Error("Call to action is required");
+  }
+};
+
+const constructMarketingPrompt = ({
+  productService,
+  targetAudience,
+  keyBenefits,
+  callToAction,
+}) => {
+  return `
+  ${PROMPTS.marketing}
+
+  Product/Service Information:
+  Name: ${productService}
+  
+  Target Audience:
+  ${targetAudience}
+  
+  Key Benefits:
+  ${keyBenefits.map((benefit) => `- ${benefit}`).join("\n")}
+  
+  Call to Action:
+  ${callToAction}
+
+  Generate a single, compelling marketing text that effectively combines all these elements.
+  `;
+};
+
+const constructStoryPrompt = ({ childName, age, proverb }) => {
+  return `
+  ${PROMPTS.story}
+
+  معلومات القصة:
+  - اسم الطفل: ${childName}
+  - العمر: ${age} سنوات
+  - المثل العربي: "${proverb}"
+
+  اكتب قصة كاملة تناسب هذه المعلومات. القصة يجب أن تكون مترابطة وممتعة وتعليمية.
+  `;
+};
+
 function formatEmailQuestion({ purpose, recipient, tone, mainDetails, cta }) {
   return `الغرض من البريد الإلكتروني هو ${purpose}، موجه إلى ${recipient}، مكتوب بنبرة ${tone}، يحتوي على التفاصيل الرئيسية ${mainDetails}، مع دعوة للعمل ${cta}.`;
 }
@@ -174,4 +315,6 @@ module.exports = {
   generateTashkeelText,
   generateProofReadingText,
   generateGrammaticalAnalysisText,
+  generateChildrenStoryText,
+  generateMarketingText,
 };

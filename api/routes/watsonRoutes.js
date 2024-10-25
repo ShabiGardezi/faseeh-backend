@@ -10,5 +10,7 @@ router.post(
   "/grammatical-analysis",
   WatsonController.generateGrammaticalAnalysis
 );
+router.post("/children-story", WatsonController.generateChildrenStory);
+router.post("/marketing-text", WatsonController.generateMarketing);
 
 module.exports = router;
