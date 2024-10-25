@@ -21,10 +21,20 @@ class WatsonController {
     }
   }
 
-
   static async generateProofReading(req, res, next) {
     try {
       const result = await WatsonXService.generateProofReadingText(req.body);
+      res.send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async generateGrammaticalAnalysis(req, res, next) {
+    try {
+      const result = await WatsonXService.generateGrammaticalAnalysisText(
+        req.body
+      );
       res.send(result);
     } catch (error) {
       next(error);

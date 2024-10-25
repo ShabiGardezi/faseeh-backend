@@ -40,9 +40,11 @@ Instructions:
   * Tanwin (تنوين)
 - Maintain the original meaning and grammatical structure
 - Ensure proper Arabic grammar rules (قواعد النحو) are followed
-- Keep the text exactly as provided without any additional explanations`,
+- Keep the text exactly as provided without any additional explanations
 
-proofread: `SYSTEM: You are in strict correction-only mode. Output must contain only the corrected Arabic text with no additional content.
+Note: Don't add anything in the response other than the proper Arabic vowelization`,
+
+  proofread: `SYSTEM: You are in strict correction-only mode. Output must contain only the corrected Arabic text with no additional content.
 
 TASK: Proofread and correct the Arabic text, fixing grammar, spelling, and punctuation. Return the corrected text exactly as is, with no additions.
 
@@ -50,7 +52,23 @@ FORMAT: Return corrected Arabic text only. Stop immediately after the last Arabi
 
 المطلوب: تصحيح النص التالي وإعادته مباشرة دون أي إضافات أو تعليقات:
 
-النص:`
+النص:`,
+
+  grammar_analysis: `SYSTEM: You are an Arabic grammar analyzer. Analyze each word's grammatical position exactly as shown in the example.
+
+TASK: Provide grammatical analysis (إعراب) for each word. Follow the exact format shown in the example below.
+
+Example Input: ذهب أحمد للمدرسة
+Example Output: ذهب: فعل ماضٍ مبني على الفتح.أحمد: فاعل مرفوع وعلامة رفعه الضمة الظاهرة على آخره.للمدرسة: اللام حرف جر، المدرسة: اسم مجرور وعلامة جره الكسرة الظاهرة على آخره.
+
+Rules:
+- Separate each word's analysis with a period
+- Combine prepositions with their nouns in analysis
+- No line breaks
+- No additional explanations
+- Exact format matching the example
+
+النص:`,
 };
 
 const DEFAULT_MODEL_PARAMS = {
@@ -109,7 +127,6 @@ Vowelized output:`;
 async function generateProofReadingText(reqBody) {
   const { content } = reqBody;
 
- 
   const prompt = `${PROMPTS.proofread}
 ${content}
 
@@ -121,6 +138,20 @@ ${content}
   });
 }
 
+async function generateGrammaticalAnalysisText(reqBody) {
+  const { content } = reqBody;
+
+  const prompt = `${PROMPTS.grammar_analysis}
+${content}
+
+الإعراب:`;
+
+  return await generateResponse({
+    input: prompt,
+    projectId: projectIds.grammer,
+    modelId: "sdaia/allam-1-13b-instruct",
+  });
+}
 
 function formatEmailQuestion({ purpose, recipient, tone, mainDetails, cta }) {
   return `الغرض من البريد الإلكتروني هو ${purpose}، موجه إلى ${recipient}، مكتوب بنبرة ${tone}، يحتوي على التفاصيل الرئيسية ${mainDetails}، مع دعوة للعمل ${cta}.`;
@@ -141,5 +172,6 @@ async function generateResponse({ input, projectId, modelId }) {
 module.exports = {
   generateProfessionalEmailText,
   generateTashkeelText,
-  generateProofReadingText
+  generateProofReadingText,
+  generateGrammaticalAnalysisText,
 };
