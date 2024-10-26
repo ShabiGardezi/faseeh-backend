@@ -7,7 +7,7 @@ const { PORT } = require("./config/environment");
 const app = express();
 
 const corsOptions = {
-  origin: ["*"],
+  origin: "*",
   credentials: true,
 };
 
