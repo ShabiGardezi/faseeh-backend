@@ -1,28 +1,18 @@
 const mongoose = require("mongoose");
 
-// Replace with your MongoDB connection string
-const uri = "mongodb://localhost:27017/yourDatabaseName";
+let isConnected;
 
-// Connect to MongoDB
-mongoose.connect(uri, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-});
+const connectDB = async () => {
+  if (isConnected) return;
 
-const db = mongoose.connection;
+  try {
+    const db = await mongoose.connect(process.env.MONGODB_URI);
+    isConnected = db.connections[0].readyState;
+    console.log("MongoDB connected");
+  } catch (error) {
+    console.error("Error connecting to MongoDB:", error);
+    throw new Error("Failed to connect to MongoDB");
+  }
+};
 
-// Connection event listeners
-db.on("connected", () => {
-  console.log("MongoDB connection established successfully");
-});
-
-db.on("error", (error) => {
-  console.error("Error in MongoDB connection: ", error);
-});
-
-db.on("disconnected", () => {
-  console.log("MongoDB connection disconnected");
-});
-
-// Export the connection
-module.exports = db;
+module.exports = connectDB;
