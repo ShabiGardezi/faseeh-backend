@@ -28,7 +28,7 @@ const PROMPTS = {
 الدعوة إلى اتخاذ إجراء: يرجى الرد بتأكيد الموعد المناسب
 <</SYS>>`,
 
-  tashkeel: `Task: Add proper Arabic vowelization (tashkeel/diacritics) to the following text while maintaining its meaning and grammatical correctness.
+  tashkeel: `Task: Add proper Arabic vowelization (tashkeel/diacritics) to the following Arabic text while maintaining its meaning and grammatical correctness. The input may contain multiple lines and spaces.
 
 Instructions:
 - Add all necessary diacritical marks (حَرَكَات) including:
@@ -38,11 +38,13 @@ Instructions:
   * Sukun (سُكُون)
   * Shadda (شَدة)
   * Tanwin (تنوين)
-- Maintain the original meaning and grammatical structure
+- Process each word independently, preserving all spaces and line breaks
+- Maintain the original text structure exactly as provided
+- Apply tashkeel to every word, regardless of its position in the text
 - Ensure proper Arabic grammar rules (قواعد النحو) are followed
-- Keep the text exactly as provided without any additional explanations
+- Return the text with exactly the same formatting as input, only adding diacritics
 
-Note: Don't add anything in the response other than the proper Arabic vowelization`,
+Note: Process the entire text as a single unit while preserving its structure. The output should maintain all original spacing and line breaks.`,
 
   proofread: `SYSTEM: You are in strict correction-only mode. Output must contain only the corrected Arabic text with no additional content.
 
@@ -110,6 +112,7 @@ const DEFAULT_MODEL_PARAMS = {
   repetition_penalty: 1,
   top_k: 50,
   decoding_method: "greedy",
+  stop_sequences: ['"""'],
 };
 
 async function generateProfessionalEmailText(reqBody) {
@@ -142,18 +145,28 @@ function constructPromptForProfessionalEmail(systemPrompt, question) {
 async function generateTashkeelText(reqBody) {
   const { content } = reqBody;
 
+  // Normalize line endings and ensure proper text boundaries
+  const normalizedContent = content.replace(/\r\n/g, "\n").trim();
+
   const prompt = `${PROMPTS.tashkeel}
 
 Input text:
-${content}
+"""
+${normalizedContent}
+"""
 
-Vowelized output:`;
+Vowelized output:
+"""`;
 
-  return await generateResponse({
+  const response = await generateResponse({
     input: prompt,
     projectId: projectIds.tashkeel,
     modelId: "sdaia/allam-1-13b-instruct",
   });
+
+  response.generated_text = response.generated_text.replace(/"""/g, "").trim();
+
+  return response;
 }
 
 async function generateProofReadingText(reqBody) {
