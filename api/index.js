@@ -1,4 +1,5 @@
 const express = require("express");
+const pdf = require("html-pdf-node");
 const cors = require("cors");
 const routes = require("./routes");
 const errorHandler = require("./middleware/errorHandler");
@@ -18,6 +19,35 @@ app.use(routes);
 app.use(errorHandler);
 
 app.get("/", (req, res) => res.send("Express on Vercel"));
+
+app.post("/api/generate-pdf", async (req, res) => {
+  try {
+    const { content } = req.body;
+
+    const htmlContent = `
+    <html>
+      <body style="direction: rtl; text-align: right;">
+        <p>${content}</p>
+      </body>
+    </html>`;
+
+    const file = { content: htmlContent };
+
+    const options = {
+      format: "A4",
+    };
+
+    const pdfBuffer = await pdf.generatePdf(file, options);
+
+    res.set({
+      "Content-Type": "application/pdf",
+      "Content-Length": pdfBuffer.length,
+    });
+    res.send(pdfBuffer);
+  } catch (error) {
+    res.status(500).send("Error generating PDF");
+  }
+});
 
 const startServer = async () => {
   try {
