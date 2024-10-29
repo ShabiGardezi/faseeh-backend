@@ -47,6 +47,7 @@ app.post("/api/generate-pdf", async (req, res) => {
     });
     res.send(pdfBuffer);
   } catch (error) {
+    console.log(error);
     res.status(500).send("Error generating PDF");
   }
 });
