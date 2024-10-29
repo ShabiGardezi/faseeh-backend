@@ -5,6 +5,8 @@ const routes = require("./routes");
 const errorHandler = require("./middleware/errorHandler");
 const { PORT } = require("./config/environment");
 const connectDB = require("./config/dbconnection");
+const chrome = require("chrome-aws-lambda");
+const puppeteer = require("puppeteer-core");
 
 //commit
 
@@ -27,19 +29,24 @@ app.post("/api/generate-pdf", async (req, res) => {
     const { content } = req.body;
 
     const htmlContent = `
-    <html>
-      <body style="direction: rtl; text-align: right;">
-        <p>${content}</p>
-      </body>
-    </html>`;
+      <html>
+        <body style="direction: rtl; text-align: right;">
+          <p>${content}</p>
+        </body>
+      </html>`;
 
     const file = { content: htmlContent };
+    const options = { format: "A4" };
 
-    const options = {
-      format: "A4",
-    };
+    const browser = await puppeteer.launch({
+      args: chrome.args,
+      executablePath: await chrome.executablePath,
+      headless: chrome.headless,
+    });
 
-    const pdfBuffer = await pdf.generatePdf(file, options);
+    const pdfBuffer = await pdf.generatePdf(file, options, browser);
+
+    await browser.close();
 
     res.set({
       "Content-Type": "application/pdf",

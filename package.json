@@ -13,6 +13,7 @@
   "dependencies": {
     "@ibm-cloud/watsonx-ai": "1.1.1",
     "bcryptjs": "2.4.3",
+    "chrome-aws-lambda": "10.1.0",
     "cors": "2.8.5",
     "dotenv": "16.4.5",
     "express": "4.21.1",
@@ -20,6 +21,7 @@
     "html-pdf-node": "1.0.8",
     "ibm-cloud-sdk-core": "5.1.0",
     "jsonwebtoken": "9.0.2",
-    "mongoose": "8.7.2"
+    "mongoose": "8.7.2",
+    "puppeteer-core": "23.6.1"
   }
 }
