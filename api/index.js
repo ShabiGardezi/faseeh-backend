@@ -5,7 +5,7 @@ const routes = require("./routes");
 const errorHandler = require("./middleware/errorHandler");
 const { PORT } = require("./config/environment");
 const connectDB = require("./config/dbconnection");
-const chrome = require("chrome-aws-lambda");
+const chromium = require("@sparticuz/chrome-aws-lambda");
 const puppeteer = require("puppeteer-core");
 
 //commit
@@ -39,9 +39,9 @@ app.post("/api/generate-pdf", async (req, res) => {
     const options = { format: "A4" };
 
     const browser = await puppeteer.launch({
-      args: chrome.args,
-      executablePath: await chrome.executablePath,
-      headless: chrome.headless,
+      args: chromium.args,
+      executablePath: await chromium.executablePath,
+      headless: chromium.headless,
     });
 
     const pdfBuffer = await pdf.generatePdf(file, options, browser);
