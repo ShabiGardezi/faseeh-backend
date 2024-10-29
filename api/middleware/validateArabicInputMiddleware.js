@@ -18,7 +18,9 @@ async function validateArabicInputMiddleware(req, res, next) {
   console.log(`Detected Language: ${detectedLang}`);
 
   if (detectedLang !== "arb" && detectedLang !== "pes") {
-    return res.status(200).json({});
+    return res
+      .status(200)
+      .json({ generated_text: "الإدخال المقدم ليس باللغة العربية" });
   }
 
   console.log("Checking input by regex");
