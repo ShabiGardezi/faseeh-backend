@@ -27,6 +27,32 @@ class AuthController {
       next(error);
     }
   }
+
+  static async verifyToken(req, res, next) {
+    try {
+      const result = await AuthService.verifyToken(req);
+      res.send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+  static async resetPasswordRequest(req, res, next) {
+    try {
+      const result = await AuthService.resetPasswordRequest(req);
+      res.send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
+
+  static async resetPassword(req, res, next) {
+    try {
+      const result = await AuthService.resetPassword(req);
+      res.send(result);
+    } catch (error) {
+      next(error);
+    }
+  }
 }
 
 module.exports = AuthController;

@@ -11,10 +11,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@emailjs/browser": "4.4.1",
     "@google-cloud/language": "6.5.0",
     "@ibm-cloud/watsonx-ai": "1.1.1",
     "bcryptjs": "2.4.3",
     "cors": "2.8.5",
+    "crypto-js": "4.2.0",
     "dotenv": "16.4.5",
     "express": "4.21.1",
     "franc": "6.2.0",
@@ -23,7 +25,9 @@
     "html-pdf-node-js": "1.0.2",
     "ibm-cloud-sdk-core": "5.1.0",
     "jsonwebtoken": "9.0.2",
+    "mailersend": "2.3.0",
     "mongoose": "8.7.2",
+    "nodemailer": "6.9.16",
     "qs": "6.13.0"
   }
 }
