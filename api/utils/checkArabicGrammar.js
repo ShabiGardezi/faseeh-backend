@@ -14,23 +14,50 @@ async function checkArabicGrammar(input) {
         headers: {
           "Content-Type": "application/x-www-form-urlencoded",
         },
+        timeout: 5000,
       }
     );
 
-    const errors = response.data.matches;
-    if (errors.length > 0) {
-      console.log("Errors found:", errors);
-      return false;
-    } else {
-      console.log("No grammar issues detected.");
-      return true;
-    }
-  } catch (error) {
-    console.error(
-      "Error during grammar check:",
-      error.response?.data || error.message
+    const errors = response.data.matches || [];
+    console.log("Grammar API Errors:", errors);
+
+    // Filter critical grammar issues, spelling issues, and clarity suggestions
+    const grammarIssues = errors.filter(
+      (error) =>
+        error.rule.issueType === "grammar" && error.rule.category.id !== "TYPOS"
     );
-    return false;
+
+    const spellingIssues = errors.filter(
+      (error) => error.rule.category.id === "TYPOS"
+    );
+
+    const claritySuggestions = errors.filter((error) =>
+      error.rule.description.includes("clarity")
+    );
+
+    // Map all errors into a consistent suggestion format
+    const suggestions = errors.map((error) => ({
+      message: error.message,
+      replacements: error.replacements.map((r) => r.value),
+      context: error.context.text,
+      offset: error.context.offset,
+      length: error.context.length,
+    }));
+
+    return {
+      valid: grammarIssues.length === 0,
+      errors: grammarIssues,
+      suggestions,
+      claritySuggestions,
+    };
+  } catch (error) {
+    console.error("Error during grammar check:", error.message);
+    return {
+      valid: false,
+      errors: [],
+      suggestions: [],
+      claritySuggestions: [],
+    };
   }
 }
 
