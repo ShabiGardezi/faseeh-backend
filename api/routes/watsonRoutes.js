@@ -1,6 +1,7 @@
 const express = require("express");
 const WatsonController = require("../controllers/watsonController");
 const validateArabicInputMiddleware = require("../middleware/validateArabicInputMiddleware");
+const validateArabicProofReadingMiddleware = require("../middleware/validateArabicProofReadingMiddleware");
 
 const router = express.Router();
 
@@ -10,7 +11,11 @@ router.post(
   validateArabicInputMiddleware,
   WatsonController.generateTashkeel
 );
-router.post("/proofread", WatsonController.generateProofReading);
+router.post(
+  "/proofread",
+  validateArabicProofReadingMiddleware,
+  WatsonController.generateProofReading
+);
 router.post(
   "/grammatical-analysis",
   WatsonController.generateGrammaticalAnalysis
