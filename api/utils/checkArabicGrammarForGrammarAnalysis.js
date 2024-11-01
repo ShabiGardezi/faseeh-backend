@@ -60,11 +60,24 @@ async function checkArabicGrammarForGrammarAnalysis(input) {
       }
     );
 
+    // Add this log statement to inspect the full response
+    console.log(
+      "Full Grammar API Response:",
+      JSON.stringify(response.data, null, 2)
+    );
+
     const errors = response.data.matches || [];
     console.log("Grammar API Errors:", JSON.stringify(errors, null, 2));
 
     // Run the diacritic check
     const diacriticResult = checkDiacritics(input);
+
+    // Extract verb-subject agreement issues
+    const verbSubjectIssues = errors
+      .filter((e) =>
+        e.rule.description.toLowerCase().includes("verb-subject agreement")
+      )
+      .map((e) => e.message);
 
     // Map suggestions with detailed logging for replacements
     const suggestions = errors.map((error) => {
@@ -99,11 +112,7 @@ async function checkArabicGrammarForGrammarAnalysis(input) {
       diacriticIssues: Array.isArray(diacriticResult.issues)
         ? diacriticResult.issues.map((issue) => issue.message)
         : [],
-      verbSubjectIssues: errors
-        .filter((e) =>
-          e.rule.description.toLowerCase().includes("verb-subject agreement")
-        )
-        .map((e) => e.message),
+      verbSubjectIssues,
       wordOrderIssues: errors
         .filter((e) => e.rule.description.toLowerCase().includes("word order"))
         .map((e) => e.message),
