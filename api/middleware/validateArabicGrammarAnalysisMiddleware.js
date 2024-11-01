@@ -42,7 +42,6 @@ async function validateArabicGrammarAnalysisMiddleware(req, res, next) {
       });
     }
 
-    // Check if the input is purely numbers or non-textual
     if (/^\d+$/.test(content.trim())) {
       return res.status(200).json({
         status: "error",
@@ -50,7 +49,6 @@ async function validateArabicGrammarAnalysisMiddleware(req, res, next) {
       });
     }
 
-    // Check if input is short (fewer than 3 words or 10 characters)
     const isShortText =
       content.trim().split(/\s+/).length < 3 || content.length < 10;
     let isArabic;

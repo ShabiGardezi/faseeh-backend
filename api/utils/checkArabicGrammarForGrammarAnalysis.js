@@ -1,6 +1,48 @@
 const axios = require("axios");
 const qs = require("qs");
 
+// Define the checkDiacritics function
+function checkDiacritics(text) {
+  try {
+    const diacriticRegex = /[\u064B-\u0652]/;
+    const wordRegex = /[\u0600-\u06FF]+/g;
+    const words = text.match(wordRegex) || [];
+    const issues = [];
+
+    console.log("Words detected for diacritic check:", words);
+
+    words.forEach((word) => {
+      if (diacriticRegex.test(word)) {
+        for (let i = 0; i < word.length; i++) {
+          if (diacriticRegex.test(word[i]) && i === 0) {
+            console.log(
+              "Issue found: Diacritic at the start of the word:",
+              word
+            );
+            issues.push({
+              word,
+              message: "Diacritic found at the start of the word",
+            });
+          }
+        }
+      }
+    });
+
+    // Return result specifically for diacritic analysis
+    return {
+      valid: issues.length === 0,
+      issues: issues,
+    };
+  } catch (error) {
+    console.error("Error during diacritic check:", error);
+    return {
+      valid: false,
+      issues: ["Error during diacritic check"],
+    };
+  }
+}
+
+// Main function for grammar analysis
 async function checkArabicGrammarForGrammarAnalysis(input) {
   try {
     const response = await axios.post(
@@ -21,6 +63,9 @@ async function checkArabicGrammarForGrammarAnalysis(input) {
     const errors = response.data.matches || [];
     console.log("Grammar API Errors:", JSON.stringify(errors, null, 2));
 
+    // Run the diacritic check
+    const diacriticResult = checkDiacritics(input);
+
     // Map suggestions with detailed logging for replacements
     const suggestions = errors.map((error) => {
       const start = error.context.offset;
@@ -31,7 +76,6 @@ async function checkArabicGrammarForGrammarAnalysis(input) {
         Math.min(end, error.context.text.length)
       );
 
-      // Log the structure of replacements for debugging
       console.log(
         "Replacements structure:",
         JSON.stringify(error.replacements, null, 2)
@@ -47,14 +91,14 @@ async function checkArabicGrammarForGrammarAnalysis(input) {
     });
 
     return {
-      valid: errors.length === 0,
+      valid: errors.length === 0 && diacriticResult.valid,
       suggestions,
       completenessIssues: errors
         .filter((e) => e.message.toLowerCase().includes("incomplete sentence"))
         .map((e) => e.message),
-      diacriticIssues: errors
-        .filter((e) => e.rule.description.toLowerCase().includes("diacritic"))
-        .map((e) => e.message),
+      diacriticIssues: Array.isArray(diacriticResult.issues)
+        ? diacriticResult.issues.map((issue) => issue.message)
+        : [],
       verbSubjectIssues: errors
         .filter((e) =>
           e.rule.description.toLowerCase().includes("verb-subject agreement")
@@ -69,6 +113,7 @@ async function checkArabicGrammarForGrammarAnalysis(input) {
     return {
       valid: false,
       suggestions: [],
+      diacriticIssues: ["Error during diacritic check"],
     };
   }
 }
