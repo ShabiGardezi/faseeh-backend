@@ -195,8 +195,8 @@ async function resetPasswordRequest(req) {
   );
   const reset_link =
     process.env.DEVELOPMENT_MODE === "production"
-      ? `https://faseeh-frontend-zeta.vercel.app/reset-password?token=${encryptedName}`
-      : "http://localhost:3000/reset-password";
+      ? `https://faseeh-frontend-zeta.vercel.app/reset-password/new-password?token=${encryptedName}`
+      : `http://localhost:3000/reset-password/new-password?token=${encryptedName}`;
 
   const recipients = [new Recipient(email, username)];
 
