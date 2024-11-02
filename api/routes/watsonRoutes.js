@@ -4,10 +4,15 @@ const validateArabicInputMiddleware = require("../middleware/validateArabicInput
 const validateArabicProofReadingMiddleware = require("../middleware/validateArabicProofReadingMiddleware");
 const validateArabicGrammarAnalysisMiddleware = require("../middleware/validateArabicGrammarAnalysisMiddleware");
 const validateChildrenStoryInputMiddleware = require("../middleware/validateChildrenStoryInputMiddleware");
+const validateProfessionalEmailInputMiddleware = require("../middleware/validateProfessionalEmailInputMiddleware");
 
 const router = express.Router();
 
-router.post("/professional-email", WatsonController.generateProfessionalEmail);
+router.post(
+  "/professional-email",
+  validateProfessionalEmailInputMiddleware,
+  WatsonController.generateProfessionalEmail
+);
 router.post(
   "/tashkeel",
   validateArabicInputMiddleware,
