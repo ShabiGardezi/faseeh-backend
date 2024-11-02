@@ -5,6 +5,7 @@ const validateArabicProofReadingMiddleware = require("../middleware/validateArab
 const validateArabicGrammarAnalysisMiddleware = require("../middleware/validateArabicGrammarAnalysisMiddleware");
 const validateChildrenStoryInputMiddleware = require("../middleware/validateChildrenStoryInputMiddleware");
 const validateProfessionalEmailInputMiddleware = require("../middleware/validateProfessionalEmailInputMiddleware");
+const validateMarketingInputMiddleware = require("../middleware/validateMarketingInputMiddleware");
 
 const router = express.Router();
 
@@ -33,6 +34,10 @@ router.post(
   validateChildrenStoryInputMiddleware,
   WatsonController.generateChildrenStory
 );
-router.post("/marketing-text", WatsonController.generateMarketing);
+router.post(
+  "/marketing-text",
+  validateMarketingInputMiddleware,
+  WatsonController.generateMarketing
+);
 
 module.exports = router;
