@@ -1,7 +1,7 @@
 const axios = require("axios");
 const qs = require("qs");
 
-async function checkArabicGrammar(input) {
+async function checkArabicGrammarForProofReading(input) {
   try {
     const response = await axios.post(
       "https://api.languagetoolplus.com/v2/check",
@@ -21,7 +21,7 @@ async function checkArabicGrammar(input) {
     const errors = response.data.matches || [];
     console.log("Grammar API Errors:", errors);
 
-    // Filter critical grammar issues, spelling issues, and clarity suggestions
+    // Classify the issues: grammar, spelling, clarity
     const grammarIssues = errors.filter(
       (error) =>
         error.rule.issueType === "grammar" && error.rule.category.id !== "TYPOS"
@@ -31,11 +31,11 @@ async function checkArabicGrammar(input) {
       (error) => error.rule.category.id === "TYPOS"
     );
 
+    // Clarity suggestions can be enabled as an enhancement if necessary
     const claritySuggestions = errors.filter((error) =>
       error.rule.description.includes("clarity")
     );
 
-    // Map all errors into a consistent suggestion format
     const suggestions = errors.map((error) => ({
       message: error.message,
       replacements: error.replacements.map((r) => r.value),
@@ -45,20 +45,22 @@ async function checkArabicGrammar(input) {
     }));
 
     return {
-      valid: grammarIssues.length === 0,
+      valid: grammarIssues.length === 0 && spellingIssues.length === 0,
       errors: grammarIssues,
+      spellingIssues,
       suggestions,
-      claritySuggestions,
+      claritySuggestions, // Optional: Include if you want to provide clarity improvements
     };
   } catch (error) {
     console.error("Error during grammar check:", error.message);
     return {
       valid: false,
       errors: [],
+      spellingIssues: [],
       suggestions: [],
       claritySuggestions: [],
     };
   }
 }
 
-module.exports = checkArabicGrammar;
+module.exports = checkArabicGrammarForProofReading;
